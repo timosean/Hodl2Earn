@@ -12,9 +12,12 @@
 
 ## 작업 및 Git 원칙
 
-- 로컬 작업 경로는 `/Users/seungwoo/Projects/Hodl2Earn`이며 별도 worktree를 만들지 않는다.
+- 로컬 작업 경로는 `/Users/seungwoo/Projects/Hodl2Earn`이다.
+- 작업 격리가 유용하면 Git worktree를 사용할 수 있다.
 - 병합은 rebase 기반의 선형 기록을 기본으로 한다.
 - 모든 Markdown 문서는 한글로 작성한다.
+- superpowers는 브레인스토밍, 스펙 작성, 구현 계획 수립까지만 사용한다.
+- `docs/superpowers/` 산출물은 로컬 참고용으로만 사용하며 Git에 커밋하지 않는다.
 
 ## 명령어와 완료 기준
 
