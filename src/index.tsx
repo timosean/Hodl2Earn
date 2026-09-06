@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { OverlayProvider } from 'overlay-kit';
 
 import App from './App';
 import './global.scss';
@@ -12,6 +13,8 @@ if (!container) {
 
 createRoot(container).render(
   <StrictMode>
-    <App />
+    <OverlayProvider>
+      <App />
+    </OverlayProvider>
   </StrictMode>,
 );
