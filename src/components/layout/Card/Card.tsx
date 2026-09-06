@@ -1,5 +1,12 @@
 import classNames from 'classnames/bind';
-import { forwardRef, type ForwardedRef, type HTMLAttributes } from 'react';
+import {
+  forwardRef,
+  type ButtonHTMLAttributes,
+  type ForwardedRef,
+  type HTMLAttributes,
+  type ReactElement,
+  type RefAttributes,
+} from 'react';
 
 import styles from './Card.module.scss';
 
@@ -7,27 +14,44 @@ const cx = classNames.bind(styles);
 
 export type CardElement = 'article' | 'div' | 'section';
 
-export interface CardProps extends HTMLAttributes<HTMLElement> {
+export interface StaticCardProps extends HTMLAttributes<HTMLElement> {
   as?: CardElement;
-  pressable?: boolean;
+  pressable?: false;
 }
 
-export const Card = forwardRef<HTMLElement, CardProps>(function Card(
-  {
-    as = 'article',
-    children,
-    className,
-    pressable = false,
-    ...props
-  },
+export interface PressableCardProps
+  extends ButtonHTMLAttributes<HTMLButtonElement> {
+  as?: never;
+  pressable: true;
+}
+
+export type CardProps = StaticCardProps | PressableCardProps;
+
+interface CardComponent {
+  (
+    props: PressableCardProps & RefAttributes<HTMLButtonElement>,
+  ): ReactElement | null;
+  (props: StaticCardProps & RefAttributes<HTMLElement>): ReactElement | null;
+}
+
+const CardBase = forwardRef<HTMLElement, CardProps>(function Card(
+  props,
   ref,
 ) {
-  if (pressable) {
+  if (props.pressable) {
+    const {
+      children,
+      className,
+      pressable: _pressable,
+      type = 'button',
+      ...buttonProps
+    } = props;
+
     return (
       <button
-        {...props}
+        {...buttonProps}
         ref={ref as ForwardedRef<HTMLButtonElement>}
-        type="button"
+        type={type}
         className={cx('card', 'pressable', className)}
       >
         {children}
@@ -35,10 +59,18 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
     );
   }
 
+  const {
+    as = 'article',
+    children,
+    className,
+    pressable: _pressable,
+    ...staticProps
+  } = props;
+
   if (as === 'div') {
     return (
       <div
-        {...props}
+        {...staticProps}
         ref={ref as ForwardedRef<HTMLDivElement>}
         className={cx('card', className)}
       >
@@ -49,7 +81,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
 
   if (as === 'section') {
     return (
-      <section {...props} ref={ref} className={cx('card', className)}>
+      <section {...staticProps} ref={ref} className={cx('card', className)}>
         {children}
       </section>
     );
@@ -57,7 +89,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
 
   return (
     <article
-      {...props}
+      {...staticProps}
       ref={ref}
       className={cx('card', className)}
     >
@@ -65,3 +97,5 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
     </article>
   );
 });
+
+export const Card = CardBase as CardComponent;

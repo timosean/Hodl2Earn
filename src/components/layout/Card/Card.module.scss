@@ -19,7 +19,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.pressable:not([aria-disabled='true']):active {
+.pressable:not(:disabled):active {
   transform: scale(0.97);
   transition-duration: var(--motion-press-duration);
 }
@@ -29,9 +29,14 @@
   outline-offset: 2px;
 }
 
+.pressable:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .pressable,
-  .pressable:not([aria-disabled='true']):active {
+  .pressable:not(:disabled):active {
     transform: none;
     transition: none;
   }
