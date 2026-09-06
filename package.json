@@ -6,7 +6,7 @@
     "start": "webpack serve --mode development",
     "build": "webpack --mode production",
     "typecheck": "tsc --noEmit",
-    "check": "yarn typecheck && yarn build"
+    "validate": "yarn typecheck && yarn build"
   },
   "dependencies": {
     "classnames": "^2.5.1",

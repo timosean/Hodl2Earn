@@ -59,7 +59,7 @@ Webpack에서 모듈 스타일과 전역 스타일이 섞이지 않도록 SCSS �
 - `yarn start`: 개발 서버를 실행한다.
 - `yarn build`: `dist/`에 프로덕션 번들을 생성한다.
 - `yarn typecheck`: 파일을 출력하지 않고 TypeScript 타입 검사를 실행한다.
-- `yarn check`: 타입 검사 후 프로덕션 빌드를 실행한다.
+- `yarn validate`: 타입 검사 후 프로덕션 빌드를 실행한다.
 
 ## 오류 처리
 
@@ -72,4 +72,3 @@ Yarn Classic으로 의존성을 설치한 후 다음 절차로 검증한다.
 1. `yarn typecheck`를 실행하고 TypeScript 오류가 없는지 확인한다.
 2. `yarn build`를 실행하고 Webpack이 HTML, JavaScript 및 추출된 CSS를 `dist/`에 생성하는지 확인한다.
 3. 생성된 자산을 살펴보고 모듈 스타일과 전역 스타일이 모두 포함되었는지 확인한다.
-

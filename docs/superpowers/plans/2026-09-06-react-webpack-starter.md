@@ -49,7 +49,7 @@
 
 **인터페이스:**
 - 입력: `src/index.tsx`, `public/index.html`, SCSS 파일
-- 출력: `yarn start`, `yarn typecheck`, `yarn build`, `yarn check` 및 `dist/`
+- 출력: `yarn start`, `yarn typecheck`, `yarn build`, `yarn validate` 및 `dist/`
 
 - [ ] **1단계: 실행 환경 확인**
 
@@ -74,7 +74,7 @@
     "start": "webpack serve --mode development",
     "build": "webpack --mode production",
     "typecheck": "tsc --noEmit",
-    "check": "yarn typecheck && yarn build"
+    "validate": "yarn typecheck && yarn build"
   },
   "dependencies": {
     "classnames": "^2.5.1",
@@ -431,7 +431,7 @@ select {
 
 - [ ] **5단계: 타입 검사와 프로덕션 빌드 실행**
 
-실행: `yarn check`
+실행: `yarn validate`
 
 예상 결과: TypeScript 오류가 없고 Webpack이 `dist/index.html` 및 콘텐츠 해시가 적용된 JavaScript와 CSS를 생성한다.
 
@@ -492,12 +492,12 @@ git commit -m "feat: 최소 React 시작 화면 추가"
 
         yarn build
 
-    타입 검사와 빌드를 한 번에 실행하려면 `yarn check`를 사용합니다.
+    타입 검사와 빌드를 한 번에 실행하려면 `yarn validate`를 사용합니다.
 
 - [ ] **2단계: 전체 검증 재실행**
 
 ```bash
-yarn check
+yarn validate
 git diff --check
 git status --short
 ```
@@ -514,7 +514,7 @@ git commit -m "docs: 프로젝트 사용 방법 추가"
 - [ ] **4단계: 최종 상태 확인**
 
 ```bash
-yarn check
+yarn validate
 git status --short
 ```
 
