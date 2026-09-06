@@ -22,10 +22,12 @@ export interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'
 export function Modal({ isOpen, close, unmount, closeOnBackdrop = true, initialFocusRef, title, description, children, footer, className, ...props }: ModalProps) {
   const { dialogRef, titleId, descriptionId, isTopMost } = useDialogAccessibility({ isOpen, close, initialFocusRef });
   const completed = useRef(false);
-  useBodyScrollLock(isOpen);
+  const wasOpen = useRef(isOpen);
+  useBodyScrollLock(isOpen || wasOpen.current);
 
   useEffect(() => {
-    if (isOpen) { completed.current = false; return; }
+    if (isOpen) { wasOpen.current = true; completed.current = false; return; }
+    if (!wasOpen.current) return;
     const finish = () => { if (!completed.current) { completed.current = true; unmount(); } };
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) { finish(); return; }
     const timer = window.setTimeout(finish, 300);
@@ -33,7 +35,7 @@ export function Modal({ isOpen, close, unmount, closeOnBackdrop = true, initialF
   }, [isOpen, unmount]);
 
   const finishTransition = (event: TransitionEvent<HTMLDivElement>) => {
-    if (event.target === event.currentTarget && !isOpen && !completed.current) { completed.current = true; unmount(); }
+    if (event.target === event.currentTarget && wasOpen.current && !isOpen && !completed.current) { completed.current = true; unmount(); }
   };
 
   return createPortal(

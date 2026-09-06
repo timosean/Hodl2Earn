@@ -17,15 +17,17 @@ export interface BottomSheetProps extends Omit<HTMLAttributes<HTMLDivElement>, '
 export function BottomSheet({ isOpen, close, unmount, closeOnBackdrop = true, initialFocusRef, title, description, children, footer, className, ...props }: BottomSheetProps) {
   const { dialogRef, titleId, descriptionId, isTopMost } = useDialogAccessibility({ isOpen, close, initialFocusRef });
   const completed = useRef(false);
-  useBodyScrollLock(isOpen);
+  const wasOpen = useRef(isOpen);
+  useBodyScrollLock(isOpen || wasOpen.current);
   useEffect(() => {
-    if (isOpen) { completed.current = false; return; }
+    if (isOpen) { wasOpen.current = true; completed.current = false; return; }
+    if (!wasOpen.current) return;
     const finish = () => { if (!completed.current) { completed.current = true; unmount(); } };
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) { finish(); return; }
     const timer = window.setTimeout(finish, 350); return () => window.clearTimeout(timer);
   }, [isOpen, unmount]);
   const finishTransition = (event: TransitionEvent<HTMLDivElement>) => {
-    if (event.target === event.currentTarget && !isOpen && !completed.current) { completed.current = true; unmount(); }
+    if (event.target === event.currentTarget && wasOpen.current && !isOpen && !completed.current) { completed.current = true; unmount(); }
   };
 
   return createPortal(

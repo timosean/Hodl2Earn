@@ -79,4 +79,67 @@ describe('Modal', () => {
     rerender(<Modal isOpen={false} close={vi.fn()} unmount={unmount} title="확인" />);
     expect(unmount).toHaveBeenCalledTimes(1); matchMedia.mockRestore();
   });
+
+  it('overlay-kit의 false → true → false 수명주기에서 실제로 열린 뒤에만 unmount한다', () => {
+    vi.useFakeTimers();
+    const unmount = vi.fn();
+    const props = { close: vi.fn(), unmount, title: '확인' };
+    const { rerender } = render(<Modal isOpen={false} {...props} />);
+    vi.runAllTimers();
+    expect(unmount).not.toHaveBeenCalled();
+
+    rerender(<Modal isOpen {...props} />);
+    rerender(<Modal isOpen={false} {...props} />);
+    vi.runAllTimers();
+    expect(unmount).toHaveBeenCalledTimes(1);
+  });
+
+  it('닫힘 애니메이션 중에도 잠금을 유지하고 중첩 오버레이가 모두 정리된 뒤 복원한다', () => {
+    const firstProps = { close: vi.fn(), unmount: vi.fn(), title: '첫째' };
+    const secondProps = { close: vi.fn(), unmount: vi.fn(), title: '둘째' };
+    const view = render(<><Modal isOpen {...firstProps} /><Modal isOpen {...secondProps} /></>);
+    view.rerender(<><Modal isOpen={false} {...firstProps} /><Modal isOpen {...secondProps} /></>);
+    expect(document.body.style.overflow).toBe('hidden');
+    view.rerender(<><Modal isOpen={false} {...firstProps} /><Modal isOpen={false} {...secondProps} /></>);
+    expect(document.body.style.overflow).toBe('hidden');
+    view.unmount();
+    expect(document.body.style.overflow).toBe('');
+  });
+
+  it('숨겨지거나 비활성인 후보와 외부 initialFocusRef를 제외하고 외부 포커스를 양방향으로 보정한다', async () => {
+    const user = userEvent.setup();
+    const outsideRef = createRef<HTMLButtonElement>();
+    render(<>
+      <button ref={outsideRef}>외부</button>
+      <Modal isOpen close={vi.fn()} unmount={vi.fn()} title="포커스" initialFocusRef={outsideRef}>
+        <button hidden>hidden</button>
+        <button aria-hidden="true">aria hidden</button>
+        <button disabled>disabled</button>
+        <fieldset disabled><button>fieldset disabled</button></fieldset>
+        <span style={{ display: 'none' }}><button>CSS hidden</button></span>
+        <button>첫 유효</button>
+        <button>마지막 유효</button>
+      </Modal>
+    </>);
+    const first = screen.getByRole('button', { name: '첫 유효' });
+    const last = screen.getByRole('button', { name: '마지막 유효' });
+    expect(first).toHaveFocus();
+    outsideRef.current?.focus();
+    await user.tab();
+    expect(first).toHaveFocus();
+    outsideRef.current?.focus();
+    await user.tab({ shift: true });
+    expect(last).toHaveFocus();
+  });
+
+  it('dialog 내부라도 포커스할 수 없는 initialFocusRef는 사용하지 않는다', () => {
+    const invalidRef = createRef<HTMLDivElement>();
+    render(
+      <Modal isOpen close={vi.fn()} unmount={vi.fn()} title="포커스" initialFocusRef={invalidRef}>
+        <div ref={invalidRef}>포커스 불가</div>
+        <button>유효 후보</button>
+      </Modal>,
+    );
+    expect(screen.getByRole('button', { name: '유효 후보' })).toHaveFocus();
+  });
 });

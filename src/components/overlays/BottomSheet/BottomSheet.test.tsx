@@ -20,11 +20,12 @@ describe('BottomSheet', () => {
 
   it('닫힘 동안 포커스와 스크롤을 복원하고 transitionend에서 unmount한다', () => {
     const opener = document.createElement('button'); document.body.append(opener); opener.focus(); const unmount = vi.fn();
-    const { rerender } = render(<BottomSheet isOpen close={vi.fn()} unmount={unmount} title="선택"><button>항목</button></BottomSheet>);
+    const view = render(<BottomSheet isOpen close={vi.fn()} unmount={unmount} title="선택"><button>항목</button></BottomSheet>);
     expect(document.body.style.overflow).toBe('hidden');
-    rerender(<BottomSheet isOpen={false} close={vi.fn()} unmount={unmount} title="선택" />);
-    expect(opener).toHaveFocus(); expect(document.body.style.overflow).toBe('');
-    fireEvent.transitionEnd(screen.getByTestId('bottom-sheet-panel')); expect(unmount).toHaveBeenCalledTimes(1); opener.remove();
+    view.rerender(<BottomSheet isOpen={false} close={vi.fn()} unmount={unmount} title="선택" />);
+    expect(opener).toHaveFocus(); expect(document.body.style.overflow).toBe('hidden');
+    fireEvent.transitionEnd(screen.getByTestId('bottom-sheet-panel')); expect(unmount).toHaveBeenCalledTimes(1);
+    view.unmount(); expect(document.body.style.overflow).toBe(''); opener.remove();
   });
 
   it('중첩 시 최상단만 처리하고 안전 타이머와 reduced-motion으로 정리한다', () => {
@@ -37,5 +38,18 @@ describe('BottomSheet', () => {
     view.rerender(<BottomSheet isOpen close={vi.fn()} unmount={immediateUnmount} title="다시" />);
     view.rerender(<BottomSheet isOpen={false} close={vi.fn()} unmount={immediateUnmount} title="다시" />);
     expect(immediateUnmount).toHaveBeenCalledTimes(1); matchMedia.mockRestore();
+  });
+
+  it('overlay-kit의 최초 닫힘 상태는 무시하고 실제 open 이후 close에서만 unmount한다', () => {
+    vi.useFakeTimers();
+    const unmount = vi.fn();
+    const props = { close: vi.fn(), unmount, title: '선택' };
+    const { rerender } = render(<BottomSheet isOpen={false} {...props} />);
+    vi.runAllTimers();
+    expect(unmount).not.toHaveBeenCalled();
+    rerender(<BottomSheet isOpen {...props} />);
+    rerender(<BottomSheet isOpen={false} {...props} />);
+    vi.runAllTimers();
+    expect(unmount).toHaveBeenCalledTimes(1);
   });
 });
