@@ -38,3 +38,24 @@ yarn build
 ```bash
 yarn validate
 ```
+
+`yarn validate`는 타입 검사, 전체 테스트, 프로덕션 빌드를 차례로 실행합니다. 테스트만 실행하려면 `yarn test`, 변경을 감시하며 테스트하려면 `yarn test:watch`를 사용합니다.
+
+## 공통 컴포넌트
+
+공통 컴포넌트는 `src/components` 아래에서 역할별로 관리합니다.
+
+```text
+components/
+├── actions/       # 버튼과 하단 액션
+├── feedback/      # 빈 상태, 배지, 스켈레톤, 토스트
+├── forms/         # 입력과 선택
+├── layout/        # 카드
+├── navigation/    # 탭
+├── overlays/      # 모달과 바텀시트
+└── index.ts       # 컴포넌트와 공개 Props 타입 배럴
+```
+
+애플리케이션에서는 `src/components/index.ts`의 단일 공개 배럴을 통해 컴포넌트와 Props 타입을 가져옵니다.
+
+`src/componentBook.tsx`는 모든 변형과 상태, `overlay-kit` 사용 예시를 모아 둔 개발용 타입 검증 파일입니다. 앱 진입점이나 라우트에서 가져오지 않으므로 프로덕션 번들에는 포함되지 않습니다.
