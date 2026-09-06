@@ -1,0 +1,18 @@
+.root {
+  position: fixed;
+  z-index: 10;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  width: 100%;
+  max-width: var(--app-max-width);
+  margin: 0 auto;
+  padding: var(--space-12) var(--space-20)
+    calc(var(--space-12) + env(safe-area-inset-bottom));
+  background: linear-gradient(to bottom, rgb(255 255 255 / 0%), var(--color-white) 24%);
+}
+
+.root > * {
+  width: 100%;
+}

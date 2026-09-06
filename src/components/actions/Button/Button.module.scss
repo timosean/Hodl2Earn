@@ -1,0 +1,111 @@
+.button {
+  position: relative;
+  display: inline-flex;
+  min-width: var(--touch-target-min);
+  min-height: var(--control-height);
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: var(--radius-12);
+  font: inherit;
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-normal);
+  cursor: pointer;
+  transition:
+    transform var(--motion-release-duration) ease,
+    background-color var(--motion-release-duration) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.button:not(:disabled):active {
+  transform: scale(0.97);
+  transition-duration: var(--motion-press-duration);
+}
+
+.button:focus-visible {
+  outline: 3px solid rgb(49 130 246 / 35%);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.primary {
+  color: var(--color-white);
+  background: var(--color-blue-500);
+}
+
+.secondary {
+  color: var(--color-blue-500);
+  background: var(--color-grey-100);
+}
+
+.weak {
+  color: var(--color-grey-900);
+  background: transparent;
+}
+
+.danger {
+  color: var(--color-white);
+  background: var(--color-red-500);
+}
+
+.small {
+  padding: var(--space-8) var(--space-16);
+  font-size: var(--font-size-caption);
+}
+
+.medium {
+  padding: var(--space-12) var(--space-20);
+  font-size: var(--font-size-body);
+}
+
+.large {
+  min-height: 56px;
+  padding: var(--space-16) var(--space-24);
+  font-size: var(--font-size-body);
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading .content {
+  opacity: 0;
+}
+
+.loader {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid currentcolor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 700ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button,
+  .button:not(:disabled):active {
+    transform: none;
+    transition: none;
+  }
+
+  .loader {
+    animation: none;
+  }
+}

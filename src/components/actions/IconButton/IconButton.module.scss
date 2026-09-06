@@ -1,0 +1,75 @@
+.button {
+  display: inline-flex;
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: var(--color-grey-900);
+  cursor: pointer;
+  transition:
+    transform var(--motion-release-duration) ease,
+    background-color var(--motion-release-duration) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.button:not(:disabled):active {
+  transform: scale(0.97);
+  transition-duration: var(--motion-press-duration);
+}
+
+.button:focus-visible {
+  outline: 3px solid rgb(49 130 246 / 35%);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.primary {
+  color: var(--color-white);
+  background: var(--color-blue-500);
+}
+
+.secondary {
+  color: var(--color-blue-500);
+  background: var(--color-grey-100);
+}
+
+.weak {
+  background: transparent;
+}
+
+.small {
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+}
+
+.medium {
+  width: var(--control-height);
+  height: var(--control-height);
+}
+
+.large {
+  width: 56px;
+  height: 56px;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button,
+  .button:not(:disabled):active {
+    transform: none;
+    transition: none;
+  }
+}
