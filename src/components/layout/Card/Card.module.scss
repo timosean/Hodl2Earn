@@ -1,0 +1,38 @@
+.card {
+  display: block;
+  width: 100%;
+  padding: var(--space-20);
+  border: 0;
+  border-radius: var(--radius-16);
+  color: var(--color-grey-900);
+  background: var(--color-white);
+  box-shadow: 0 4px 16px rgb(25 31 40 / 8%);
+  font: inherit;
+  text-align: left;
+}
+
+.pressable {
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+  cursor: pointer;
+  transition: transform var(--motion-release-duration) ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pressable:not([aria-disabled='true']):active {
+  transform: scale(0.97);
+  transition-duration: var(--motion-press-duration);
+}
+
+.pressable:focus-visible {
+  outline: 3px solid rgb(49 130 246 / 35%);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pressable,
+  .pressable:not([aria-disabled='true']):active {
+    transform: none;
+    transition: none;
+  }
+}
