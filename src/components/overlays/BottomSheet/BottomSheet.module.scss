@@ -1,0 +1,13 @@
+.root { position: fixed; inset: 0; z-index: 1000; display: grid; }
+.backdrop { display: flex; align-items: flex-end; background: rgb(25 31 40 / 48%); opacity: 0; transition: opacity var(--motion-release-duration) ease; }
+.panel { width: 100%; max-height: calc(100dvh - 40px); overflow: auto; padding: var(--space-12) var(--space-24) calc(var(--space-24) + env(safe-area-inset-bottom)); border-radius: var(--radius-24) var(--radius-24) 0 0; background: var(--color-white); box-shadow: var(--shadow-overlay); color: var(--color-grey-900); transform: translateY(100%); transition: transform var(--motion-release-duration) ease; }
+.open .backdrop { opacity: 1; }
+.open .panel { transform: translateY(0); }
+.closing { pointer-events: none; }
+.handle { width: 36px; height: 4px; margin: 0 auto var(--space-20); border-radius: 999px; background: var(--color-grey-200); }
+.title { margin: 0; font-size: var(--font-size-title); line-height: var(--line-height-tight); }
+.description { margin: var(--space-8) 0 0; color: var(--color-grey-600); line-height: var(--line-height-normal); }
+.content { margin-top: var(--space-20); }
+.footer { margin-top: var(--space-24); }
+.panel:focus-visible { outline: 3px solid var(--color-blue-500); outline-offset: -3px; }
+@media (prefers-reduced-motion: reduce) { .backdrop, .panel { transition: none; } }
