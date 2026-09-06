@@ -52,4 +52,14 @@ describe('BottomSheet', () => {
     vi.runAllTimers();
     expect(unmount).toHaveBeenCalledTimes(1);
   });
+
+  it('소비자의 onTransitionEnd를 호출하면서 내부 unmount도 완료한다', () => {
+    const onTransitionEnd = vi.fn();
+    const unmount = vi.fn();
+    const view = render(<BottomSheet isOpen close={vi.fn()} unmount={unmount} title="선택" onTransitionEnd={onTransitionEnd} />);
+    view.rerender(<BottomSheet isOpen={false} close={vi.fn()} unmount={unmount} title="선택" onTransitionEnd={onTransitionEnd} />);
+    fireEvent.transitionEnd(screen.getByTestId('bottom-sheet-panel'));
+    expect(onTransitionEnd).toHaveBeenCalledTimes(1);
+    expect(unmount).toHaveBeenCalledTimes(1);
+  });
 });

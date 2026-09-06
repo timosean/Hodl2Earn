@@ -19,7 +19,7 @@ export interface ModalProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'
   footer?: ReactNode;
 }
 
-export function Modal({ isOpen, close, unmount, closeOnBackdrop = true, initialFocusRef, title, description, children, footer, className, ...props }: ModalProps) {
+export function Modal({ isOpen, close, unmount, closeOnBackdrop = true, initialFocusRef, title, description, children, footer, className, onTransitionEnd, ...props }: ModalProps) {
   const { dialogRef, titleId, descriptionId, isTopMost } = useDialogAccessibility({ isOpen, close, initialFocusRef });
   const completed = useRef(false);
   const wasOpen = useRef(isOpen);
@@ -35,6 +35,7 @@ export function Modal({ isOpen, close, unmount, closeOnBackdrop = true, initialF
   }, [isOpen, unmount]);
 
   const finishTransition = (event: TransitionEvent<HTMLDivElement>) => {
+    onTransitionEnd?.(event);
     if (event.target === event.currentTarget && wasOpen.current && !isOpen && !completed.current) { completed.current = true; unmount(); }
   };
 

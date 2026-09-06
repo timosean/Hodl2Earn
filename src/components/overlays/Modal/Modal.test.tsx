@@ -142,4 +142,62 @@ describe('Modal', () => {
     );
     expect(screen.getByRole('button', { name: '유효 후보' })).toHaveFocus();
   });
+
+  it('중첩 오버레이의 하위가 먼저 닫혀도 최상단 dialog 내부 포커스를 유지한다', () => {
+    const opener = document.createElement('button');
+    document.body.append(opener);
+    opener.focus();
+    const lowerProps = { close: vi.fn(), unmount: vi.fn(), title: '하위' };
+    const upperProps = { close: vi.fn(), unmount: vi.fn(), title: '최상단' };
+    const view = render(
+      <>
+        <Modal isOpen {...lowerProps}><button>하위 버튼</button></Modal>
+        <Modal isOpen {...upperProps}><button>최상단 버튼</button></Modal>
+      </>,
+    );
+    const upperButton = screen.getByRole('button', { name: '최상단 버튼' });
+    expect(upperButton).toHaveFocus();
+    view.rerender(
+      <>
+        <Modal isOpen={false} {...lowerProps}><button>하위 버튼</button></Modal>
+        <Modal isOpen {...upperProps}><button>최상단 버튼</button></Modal>
+      </>,
+    );
+    expect(upperButton).toHaveFocus();
+    view.rerender(
+      <>
+        <Modal isOpen={false} {...lowerProps}><button>하위 버튼</button></Modal>
+        <Modal isOpen={false} {...upperProps}><button>최상단 버튼</button></Modal>
+      </>,
+    );
+    expect(opener).toHaveFocus();
+    opener.remove();
+  });
+
+  it('모든 음수 tabindex를 제외하고 contenteditable 순차 포커스 후보를 포함한다', async () => {
+    const user = userEvent.setup();
+    render(
+      <Modal isOpen close={vi.fn()} unmount={vi.fn()} title="후보">
+        <button tabIndex={-2}>제외</button>
+        <div contentEditable suppressContentEditableWarning tabIndex={0}>편집 영역</div>
+        <button>마지막</button>
+      </Modal>,
+    );
+    const editable = screen.getByText('편집 영역');
+    const last = screen.getByRole('button', { name: '마지막' });
+    expect(editable).toHaveFocus();
+    last.focus();
+    await user.tab();
+    expect(editable).toHaveFocus();
+  });
+
+  it('소비자의 onTransitionEnd와 내부 unmount 처리를 함께 호출한다', () => {
+    const onTransitionEnd = vi.fn();
+    const unmount = vi.fn();
+    const view = render(<Modal isOpen close={vi.fn()} unmount={unmount} title="확인" onTransitionEnd={onTransitionEnd} />);
+    view.rerender(<Modal isOpen={false} close={vi.fn()} unmount={unmount} title="확인" onTransitionEnd={onTransitionEnd} />);
+    fireEvent.transitionEnd(screen.getByTestId('modal-panel'));
+    expect(onTransitionEnd).toHaveBeenCalledTimes(1);
+    expect(unmount).toHaveBeenCalledTimes(1);
+  });
 });

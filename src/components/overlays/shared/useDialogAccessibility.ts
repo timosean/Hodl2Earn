@@ -1,10 +1,17 @@
 import { type RefObject, useEffect, useId, useLayoutEffect, useRef } from 'react';
 
-const overlayStack: symbol[] = [];
+interface OverlayEntry {
+  id: symbol;
+  dialog: HTMLElement;
+  restoreTarget: HTMLElement | null;
+}
+
+const overlayStack: OverlayEntry[] = [];
 const focusableSelector = [
   'a[href]', 'button:not([disabled])', 'input:not([disabled])',
   'select:not([disabled])', 'textarea:not([disabled])',
-  '[tabindex]:not([tabindex="-1"])',
+  '[tabindex]', '[contenteditable]:not([contenteditable="false"])',
+  'audio[controls]', 'video[controls]', 'summary',
 ].join(',');
 
 function isVisible(element: HTMLElement, dialog: HTMLElement): boolean {
@@ -29,7 +36,7 @@ function isVisible(element: HTMLElement, dialog: HTMLElement): boolean {
 
 function getFocusableElements(dialog: HTMLElement): HTMLElement[] {
   return Array.from(dialog.querySelectorAll<HTMLElement>(focusableSelector))
-    .filter((element) => isVisible(element, dialog));
+    .filter((element) => element.tabIndex >= 0 && isVisible(element, dialog));
 }
 
 export interface DialogAccessibilityOptions {
@@ -43,24 +50,27 @@ export function useDialogAccessibility({ isOpen, close, initialFocusRef }: Dialo
   const overlayId = useRef(Symbol('overlay'));
   const closeRef = useRef(close);
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+  const restoreTargetRef = useRef<HTMLElement | null>(null);
   const titleId = useId();
   const descriptionId = useId();
 
-  const isTopMost = () => overlayStack[overlayStack.length - 1] === overlayId.current;
+  const isTopMost = () => overlayStack[overlayStack.length - 1]?.id === overlayId.current;
   closeRef.current = close;
 
   useLayoutEffect(() => {
     if (!isOpen) return;
     previouslyFocusedRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const id = overlayId.current;
-    overlayStack.push(id);
 
     const dialog = dialogRef.current;
+    if (!dialog) return;
+    overlayStack.push({ id, dialog, restoreTarget: previouslyFocusedRef.current });
     const focusable = dialog ? getFocusableElements(dialog) : [];
     const requestedInitial = initialFocusRef?.current;
     const initial = requestedInitial
       && dialog?.contains(requestedInitial)
       && requestedInitial.matches(focusableSelector)
+      && requestedInitial.tabIndex >= 0
       && isVisible(requestedInitial, dialog)
       ? requestedInitial
       : focusable[0] ?? dialog;
@@ -91,16 +101,27 @@ export function useDialogAccessibility({ isOpen, close, initialFocusRef }: Dialo
 
     return () => {
       document.removeEventListener('keydown', onKeyDown);
-      const index = overlayStack.lastIndexOf(id);
-      if (index >= 0) overlayStack.splice(index, 1);
+      const index = overlayStack.findIndex((entry) => entry.id === id);
+      if (index < 0) return;
+      const removed = overlayStack[index];
+      const wasTopMost = index === overlayStack.length - 1;
+      for (let upperIndex = index + 1; upperIndex < overlayStack.length; upperIndex += 1) {
+        const upper = overlayStack[upperIndex];
+        if (upper.restoreTarget && removed.dialog.contains(upper.restoreTarget)) {
+          upper.restoreTarget = removed.restoreTarget;
+        }
+      }
+      overlayStack.splice(index, 1);
+      restoreTargetRef.current = wasTopMost ? removed.restoreTarget : null;
     };
   }, [initialFocusRef, isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
     return () => {
-      const previouslyFocused = previouslyFocusedRef.current;
-      if (previouslyFocused?.isConnected) previouslyFocused.focus();
+      const restoreTarget = restoreTargetRef.current;
+      restoreTargetRef.current = null;
+      if (restoreTarget?.isConnected) restoreTarget.focus();
     };
   }, [isOpen]);
 

@@ -14,7 +14,7 @@ export interface BottomSheetProps extends Omit<HTMLAttributes<HTMLDivElement>, '
   footer?: ReactNode;
 }
 
-export function BottomSheet({ isOpen, close, unmount, closeOnBackdrop = true, initialFocusRef, title, description, children, footer, className, ...props }: BottomSheetProps) {
+export function BottomSheet({ isOpen, close, unmount, closeOnBackdrop = true, initialFocusRef, title, description, children, footer, className, onTransitionEnd, ...props }: BottomSheetProps) {
   const { dialogRef, titleId, descriptionId, isTopMost } = useDialogAccessibility({ isOpen, close, initialFocusRef });
   const completed = useRef(false);
   const wasOpen = useRef(isOpen);
@@ -27,6 +27,7 @@ export function BottomSheet({ isOpen, close, unmount, closeOnBackdrop = true, in
     const timer = window.setTimeout(finish, 350); return () => window.clearTimeout(timer);
   }, [isOpen, unmount]);
   const finishTransition = (event: TransitionEvent<HTMLDivElement>) => {
+    onTransitionEnd?.(event);
     if (event.target === event.currentTarget && wasOpen.current && !isOpen && !completed.current) { completed.current = true; unmount(); }
   };
 
