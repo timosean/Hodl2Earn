@@ -1,0 +1,34 @@
+.tabs {
+  display: flex;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-16);
+  background: var(--color-grey-100);
+}
+
+.tab {
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+  flex: 1;
+  padding: var(--space-8) var(--space-12);
+  border: 0;
+  border-radius: var(--radius-12);
+  color: var(--color-grey-600);
+  background: transparent;
+  font: inherit;
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-normal);
+  cursor: pointer;
+}
+
+.tab:focus-visible {
+  outline: 3px solid rgb(49 130 246 / 35%);
+  outline-offset: 1px;
+}
+
+.selected {
+  color: var(--color-grey-900);
+  background: var(--color-white);
+  box-shadow: 0 1px 3px rgb(25 31 40 / 10%);
+}
